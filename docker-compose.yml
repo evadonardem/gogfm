@@ -1,0 +1,38 @@
+version: "3"
+
+services:
+  mysql:
+    image: "mysql:latest"
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    networks:
+      - database
+    ports:
+      - "3307:3306"
+    volumes:
+      - "./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro"
+      - "mysql_data:/var/lib/mysql"
+
+  workspace:
+    image: evadonardem/php-apache:latest
+    domainname: localhost
+    hostname: dev
+    depends_on:
+      - mysql
+    networks:
+      database:
+    ports:
+      - "8080:80"
+    tty: true
+    volumes:
+      - '.:/var/www/html'
+
+# Volumes setup
+volumes:
+  mysql_data:
+
+# Networks setup
+networks:
+  database:
+
